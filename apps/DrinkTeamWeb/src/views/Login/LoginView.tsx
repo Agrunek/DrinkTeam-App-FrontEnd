@@ -7,18 +7,15 @@ const LoginView = () => {
 
   return (
     <View style={styles.container}>
-      {/* Top Section */}
       <View style={[styles.topSection, { backgroundColor: colors.primary }]}>
         <Text style={styles.headerText}>DRINK</Text>
         <Text style={styles.taglineText}>Craft with flair, drink with care!</Text>
       </View>
 
-      {/* Middle Section */}
       <View style={[styles.middleSection, { backgroundColor: colors.background }]}>
         <Text style={styles.logoText}>LOGO</Text>
         <Text style={styles.loginText}>Login</Text>
 
-        {/* Inputs */}
         <TextInput
           label="Login / Mail"
           mode="outlined"
@@ -31,7 +28,6 @@ const LoginView = () => {
           style={styles.input}
         />
 
-        {/* Buttons */}
         <Button mode="contained" onPress={() => console.log('Login pressed')} style={styles.button}>
           LOGIN
         </Button>
@@ -40,7 +36,6 @@ const LoginView = () => {
         </Button>
       </View>
 
-      {/* Bottom Section */}
       <TouchableOpacity onPress={() => console.log('Forgot password pressed')}>
         <Text style={styles.forgotText}>If you forgot your password click here</Text>
       </TouchableOpacity>

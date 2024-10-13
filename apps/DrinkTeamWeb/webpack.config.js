@@ -26,9 +26,9 @@ module.exports = {
         },
       },
       {
-        test: /\.ttf$/, // Load .ttf font files
-        loader: 'url-loader', // Use url-loader to handle fonts
-        include: path.resolve(__dirname, 'node_modules/react-native-vector-icons'), // Include vector icons fonts
+        test: /\.ttf$/,
+        loader: 'url-loader',
+        include: path.resolve(__dirname, 'node_modules/react-native-vector-icons'),
       },
     ],
   },

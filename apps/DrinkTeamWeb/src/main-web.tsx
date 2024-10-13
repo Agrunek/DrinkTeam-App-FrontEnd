@@ -9,7 +9,7 @@ import iconFont from 'react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf
 
 const iconFontStyles = `@font-face {
   src: url(${iconFont});
-  font-family: FontAwesome;
+  font-family: MaterialCommunityIcons;
 }`;
 
 const style = document.createElement('style');

@@ -1,15 +1,50 @@
 const { NxAppWebpackPlugin } = require('@nx/webpack/app-plugin');
 const { NxReactWebpackPlugin } = require('@nx/react/webpack-plugin');
+const path = require('path');
 
 module.exports = {
   resolve: {
     alias: {
       'react-native$': 'react-native-web',
     },
-    extensions: ['.web.tsx', '.web.ts', '.web.jsx', '.web.js'],
+    extensions: ['.web.tsx', '.web.ts', '.web.jsx', '.web.js', '.ts', '.tsx', '.js', '.jsx'],
   },
   devServer: {
-    port: 4200,
+    port: 4220,
+  },
+  module: {
+    rules: [
+      {
+        test: /\.[jt]sx?$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env', '@babel/preset-react', '@babel/preset-typescript'],
+            plugins: [
+              [
+                '@babel/plugin-proposal-class-properties',
+                { loose: true }, // Ensure "loose" mode for class properties
+              ],
+              [
+                '@babel/plugin-proposal-private-methods',
+                { loose: true }, // Ensure "loose" mode for private methods
+              ],
+              [
+                '@babel/plugin-proposal-private-property-in-object',
+                { loose: true }, // Ensure "loose" mode for private properties
+              ],
+              '@babel/plugin-transform-runtime',
+            ],
+          },
+        },
+      },
+      {
+        test: /\.ttf$/, // Load .ttf font files
+        loader: 'url-loader', // Use url-loader to handle fonts
+        include: path.resolve(__dirname, 'node_modules/react-native-vector-icons'), // Include vector icons fonts
+      },
+    ],
   },
   plugins: [
     new NxAppWebpackPlugin({
@@ -26,7 +61,6 @@ module.exports = {
     }),
     new NxReactWebpackPlugin({
       // Uncomment this line if you don't want to use SVGR
-      // See: https://react-svgr.com/
       // svgr: false
     }),
   ],

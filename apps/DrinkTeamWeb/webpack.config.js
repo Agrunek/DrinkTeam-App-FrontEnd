@@ -10,33 +10,19 @@ module.exports = {
     extensions: ['.web.tsx', '.web.ts', '.web.jsx', '.web.js', '.ts', '.tsx', '.js', '.jsx'],
   },
   devServer: {
-    port: 4220,
+    port: 4230,
   },
   module: {
     rules: [
       {
-        test: /\.[jt]sx?$/,
-        exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: ['@babel/preset-env', '@babel/preset-react', '@babel/preset-typescript'],
-            plugins: [
-              [
-                '@babel/plugin-proposal-class-properties',
-                { loose: true }, // Ensure "loose" mode for class properties
-              ],
-              [
-                '@babel/plugin-proposal-private-methods',
-                { loose: true }, // Ensure "loose" mode for private methods
-              ],
-              [
-                '@babel/plugin-proposal-private-property-in-object',
-                { loose: true }, // Ensure "loose" mode for private properties
-              ],
-              '@babel/plugin-transform-runtime',
-            ],
-          },
+        test: /\.(js|jsx)$/,
+        include: /react-native-vector-icons/,
+        loader: 'babel-loader',
+        options: {
+          presets: [
+            '@babel/preset-env',
+            ['@babel/preset-react', { runtime: 'automatic' }],
+          ],
         },
       },
       {

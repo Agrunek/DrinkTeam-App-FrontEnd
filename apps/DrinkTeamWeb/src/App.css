@@ -1,4 +1,4 @@
-@font-face {
+/* @font-face {
     src: url('/node_modules/react-native-vector-icons/Fonts/Ionicons.ttf');
     font-family: "Ionicons";
   }
@@ -38,7 +38,7 @@
     src: url('/node_modules/react-native-vector-icons/Feather.ttf');
     font-family: "Feather";
   }
-  
+   */
   @font-face {
     src: url('/node_modules/react-native-vector-icons/MaterialCommunityIcons.ttf');
     font-family: "MaterialCommunityIcons";

@@ -14,24 +14,12 @@ module.exports = function (api) {
           },
         ],
       ],
-      plugins: [
-        // Add the necessary plugins for class properties and private methods
-        ['@babel/plugin-proposal-class-properties', { loose: true }],
-        ['@babel/plugin-proposal-private-methods', { loose: true }],
-        ['@babel/plugin-proposal-private-property-in-object', { loose: true }],
-      ],
     };
   }
 
   return {
     presets: [
       ['module:@react-native/babel-preset', { useTransformReactJSX: true }],
-    ],
-    plugins: [
-      // Add the necessary plugins for React Native environment as well
-      ['@babel/plugin-proposal-class-properties', { loose: true }],
-      ['@babel/plugin-proposal-private-methods', { loose: true }],
-      ['@babel/plugin-proposal-private-property-in-object', { loose: true }],
     ],
   };
 };

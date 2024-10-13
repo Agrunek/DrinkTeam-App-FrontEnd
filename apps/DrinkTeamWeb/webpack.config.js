@@ -10,7 +10,7 @@ module.exports = {
     extensions: ['.web.tsx', '.web.ts', '.web.jsx', '.web.js', '.ts', '.tsx', '.js', '.jsx'],
   },
   devServer: {
-    port: 4230,
+    port: 4200,
   },
   module: {
     rules: [

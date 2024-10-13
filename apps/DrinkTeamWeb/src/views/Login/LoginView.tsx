@@ -3,7 +3,7 @@ import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { TextInput, Button, useTheme } from 'react-native-paper';
 
 const LoginView = () => {
-  const { colors } = useTheme(); // Access the theme colors
+  const { colors } = useTheme();
 
   return (
     <View style={styles.container}>

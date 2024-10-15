@@ -4,13 +4,22 @@ const theme = {
   ...DefaultTheme,
   colors: {
     ...DefaultTheme.colors,
-    primary: '#5C4D7D',  // Purple shade for header background
-    accent: '#00C48C',   // Green color for the login button
-    background: '#222',  // Dark background color for login form area
-    surface: '#FFF',     // White background for text input fields
-    text: '#FFF',        // White text for contrast
-    placeholder: '#8A8A8A',  // Gray for placeholder text
-    buttonText: '#FFFFFF', // White for button text
+    primary: '#9586A8',
+    onPrimary: '#ffffff',
+
+    secondary: '#1a1c22',
+    onSecondary: '#ffffff',
+
+    secondaryContainer: '#0cce83',
+    onSecondaryContainer: '#23232c',
+
+    tertiary: '#0cce83',
+    onTetriary: '#000000',
+
+    background: '#1a1c22',
+    onBackground: '#ffffff',
+
+    outline: '#9586A8',
   },
 };
 

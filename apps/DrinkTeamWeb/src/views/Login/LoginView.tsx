@@ -67,6 +67,7 @@ const LoginView = () => {
       backgroundColor: colors.secondary, // Ensure the same background as the middle section
     },
     forgotText: {
+      flex: 1,
       color: colors.primary,
       textAlign: 'center',
       textDecorationLine: 'underline',

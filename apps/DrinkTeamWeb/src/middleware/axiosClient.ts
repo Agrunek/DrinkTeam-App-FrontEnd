@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosClient = axios.create({
-  baseURL: 'http://my-api.com',
+  baseURL: 'https://drinkteam.azurewebsites.net/api',
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',

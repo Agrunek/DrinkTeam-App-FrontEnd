@@ -17,3 +17,20 @@ export const usePosts = (searchString) => {
     enabled: !!searchString,
   });
 };
+
+export const fetchTest = async (testString) => {
+  const response = await axiosClient.get('/drink_team_test', {
+    params: {
+      name: testString
+    }
+  });
+  return response.data;
+}
+
+export const useTest = (testString) => {
+  return useQuery({
+    queryKey: ['test', testString],
+    queryFn: () => fetchTest(testString),
+    enabled: true,
+  });
+};

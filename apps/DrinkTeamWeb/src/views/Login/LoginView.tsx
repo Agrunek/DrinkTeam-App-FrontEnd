@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { TextInput, Button, useTheme, Text } from 'react-native-paper';
+import { useTest } from '../../middleware/queries';
 
 const LoginView = () => {
   const theme = useTheme();
   const { colors } = theme;
+  const [testStr, setTestStr] = useState('');
+  const {data} = useTest(testStr);
 
   const styles = StyleSheet.create({
     container: {
@@ -88,6 +91,7 @@ const LoginView = () => {
         <Text style={styles.loginText}>Login</Text>
 
         <TextInput
+          onChangeText={(text) => setTestStr(text)}
           label="Login / Mail"
           mode="outlined"
           textColor={colors.primary}
@@ -103,7 +107,7 @@ const LoginView = () => {
 
         <Button
           mode="contained-tonal"
-          onPress={() => console.log('Login pressed')}
+          onPress={() => console.log(data)}
           style={styles.button}
           contentStyle={{ height: 70 }}
           labelStyle={{ fontWeight: 'bold' }}

@@ -1,10 +1,13 @@
-import React from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { TextInput, Button, useTheme, Text } from 'react-native-paper';
+import { useTest } from '../../middleware/queries';
 
 const LoginView = () => {
   const theme = useTheme();
   const { colors } = theme;
+  const [testStr, setTestStr] = useState('');
+  const { data } = useTest(testStr);
 
   const styles = StyleSheet.create({
     container: {
@@ -64,68 +67,75 @@ const LoginView = () => {
     },
     forgotSection: {
       marginTop: 20,
-      backgroundColor: colors.secondary, // Ensure the same background as the middle section
+      backgroundColor: colors.background,
     },
     forgotText: {
-      flex: 1,
       color: colors.primary,
       textAlign: 'center',
       textDecorationLine: 'underline',
       marginTop: 20,
-      paddingBottom: 20,
+      paddingBottom: 7,
     },
   });
 
   return (
-    <View style={styles.container}>
-      <View style={styles.topSection}>
-        <Text style={styles.headerText}>DRINK</Text>
-        <Text style={styles.taglineText}>Craft with flair, drink with care!</Text>
-      </View>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={styles.container}>
+          <View style={styles.topSection}>
+            <Text style={styles.headerText}>DRINK</Text>
+            <Text style={styles.taglineText}>Craft with flair, drink with care!</Text>
+          </View>
 
-      <View style={[styles.middleSection]}>
-        <Text style={styles.logoText}>LOGO</Text>
-        <Text style={styles.loginText}>Login</Text>
+          <View style={[styles.middleSection]}>
+            <Text style={styles.logoText}>LOGO</Text>
+            <Text style={styles.loginText}>Login</Text>
 
-        <TextInput
-          label="Login / Mail"
-          mode="outlined"
-          textColor={colors.primary}
-          style={styles.input}
-        />
-        <TextInput
-          label="Password"
-          mode="outlined"
-          textColor={colors.primary}
-          secureTextEntry={true}
-          style={styles.input}
-        />
+            <TextInput
+              onChangeText={(text) => setTestStr(text)}
+              label="Login / Mail"
+              mode="outlined"
+              textColor={colors.primary}
+              style={styles.input}
+            />
+            <TextInput
+              label="Password"
+              mode="outlined"
+              textColor={colors.primary}
+              secureTextEntry={true}
+              style={styles.input}
+            />
 
-        <Button
-          mode="contained-tonal"
-          onPress={() => console.log('Login pressed')}
-          style={styles.button}
-          contentStyle={{ height: 70 }}
-          labelStyle={{ fontWeight: 'bold' }}
-        >
-          LOGIN
-        </Button>
+            <Button
+              mode="contained-tonal"
+              onPress={() => console.log(data)}
+              style={styles.button}
+              contentStyle={{ height: 70 }}
+              labelStyle={{ fontWeight: 'bold' }}
+            >
+              LOGIN
+            </Button>
 
-        <Button
-          mode="outlined"
-          onPress={() => console.log('Register pressed')}
-          style={[styles.button, styles.registerButton]}
-          contentStyle={{ height: 50 }}
-          labelStyle={{ fontWeight: 'bold' }}
-        >
-          REGISTER
-        </Button>
+            <Button
+              mode="outlined"
+              onPress={() => console.log('Register pressed')}
+              style={[styles.button, styles.registerButton]}
+              contentStyle={{ height: 50 }}
+              labelStyle={{ fontWeight: 'bold' }}
+            >
+              REGISTER
+            </Button>
 
-        <TouchableOpacity onPress={() => console.log('Forgot password pressed')} style={styles.forgotSection}>
-          <Text style={styles.forgotText}>If you forgot your password click here</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+            <TouchableOpacity onPress={() => console.log('Forgot password pressed')} style={styles.forgotSection}>
+              <Text style={styles.forgotText}>If you forgot your password click here</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 

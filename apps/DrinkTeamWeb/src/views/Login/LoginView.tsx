@@ -67,7 +67,7 @@ const LoginView = () => {
     },
     forgotSection: {
       marginTop: 20,
-      backgroundColor: colors.secondary, // Ensure the same background as the middle section
+      backgroundColor: colors.background,
     },
     forgotText: {
       color: colors.primary,

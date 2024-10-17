@@ -6,9 +6,10 @@
     "@react-native/metro-config": "*",
     "@testing-library/jest-native": "*",
     "@testing-library/react-native": "*",
+    "metro-config": "*",
     "react": "*",
     "react-native": "*",
-    "react-native-svg": "*",
-    "metro-config": "*"
+    "react-native-safe-area-context": "^4.11.1",
+    "react-native-svg": "*"
   }
 }

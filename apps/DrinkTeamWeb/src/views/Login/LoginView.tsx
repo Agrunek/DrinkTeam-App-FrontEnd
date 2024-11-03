@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { TextInput, Button, useTheme, Text } from 'react-native-paper';
 import { useTest } from '../../middleware/queries';
+import { useNavigation } from '@react-navigation/native';
 
 const LoginView = () => {
   const theme = useTheme();
   const { colors } = theme;
   const [testStr, setTestStr] = useState('');
   const { data } = useTest(testStr);
+  const navigation = useNavigation();
 
   const styles = StyleSheet.create({
     container: {

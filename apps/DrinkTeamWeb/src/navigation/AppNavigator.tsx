@@ -1,27 +1,27 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 import LoginView from '../views/Login/LoginView';
 import HomeView from '../views/Home/HomeView';
 
 
-const Stack = createNativeStackNavigator();
+const Drawer = createDrawerNavigator();
 
 const AppNavigator = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen 
+      <Drawer.Navigator initialRouteName="Login">
+        <Drawer.Screen 
           name="Login" 
           component={LoginView} 
           options={{ headerShown: false }} 
         />
-        <Stack.Screen 
+        <Drawer.Screen 
           name="Home" 
           component={HomeView} 
           options={{ title: 'Home' }}
         />
-      </Stack.Navigator>
+      </Drawer.Navigator>
     </NavigationContainer>
   );
 };

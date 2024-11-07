@@ -113,7 +113,7 @@ const LoginView = () => {
 
             <Button
               mode="contained-tonal"
-              onPress={() => console.log(data)}
+              onPress={() => navigation.navigate('Recipies')}
               style={styles.button}
               contentStyle={{ height: 70 }}
               labelStyle={{ fontWeight: 'bold' }}
@@ -123,7 +123,7 @@ const LoginView = () => {
 
             <Button
               mode="outlined"
-              onPress={() => console.log('Register pressed')}
+              onPress={() => navigation.navigate('Recipies')}
               style={[styles.button, styles.registerButton]}
               contentStyle={{ height: 50 }}
               labelStyle={{ fontWeight: 'bold' }}
@@ -131,7 +131,7 @@ const LoginView = () => {
               REGISTER
             </Button>
 
-            <TouchableOpacity onPress={() => console.log('Forgot password pressed')} style={styles.forgotSection}>
+            <TouchableOpacity onPress={() => console.log(data)} style={styles.forgotSection}>
               <Text style={styles.forgotText}>If you forgot your password click here</Text>
             </TouchableOpacity>
           </View>

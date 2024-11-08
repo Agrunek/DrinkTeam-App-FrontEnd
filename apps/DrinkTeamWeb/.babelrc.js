@@ -14,12 +14,18 @@ module.exports = function (api) {
           },
         ],
       ],
+      plugins: [
+        "react-native-reanimated/plugin",
+      ],
     };
   }
 
   return {
     presets: [
       ['module:@react-native/babel-preset', { useTransformReactJSX: true }],
+    ],
+    plugins: [
+      "react-native-reanimated/plugin",
     ],
   };
 };

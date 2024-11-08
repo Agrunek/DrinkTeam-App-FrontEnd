@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { TextInput, Button, useTheme, Text } from 'react-native-paper';
 import { useTest } from '../../middleware/queries';
+import { useNavigation } from '@react-navigation/native';
 
 const LoginView = () => {
   const theme = useTheme();
   const { colors } = theme;
   const [testStr, setTestStr] = useState('');
   const { data } = useTest(testStr);
+  const navigation = useNavigation();
 
   const styles = StyleSheet.create({
     container: {
@@ -111,7 +113,7 @@ const LoginView = () => {
 
             <Button
               mode="contained-tonal"
-              onPress={() => console.log(data)}
+              onPress={() => navigation.navigate('Recipies')}
               style={styles.button}
               contentStyle={{ height: 70 }}
               labelStyle={{ fontWeight: 'bold' }}
@@ -121,7 +123,7 @@ const LoginView = () => {
 
             <Button
               mode="outlined"
-              onPress={() => console.log('Register pressed')}
+              onPress={() => navigation.navigate('Recipies')}
               style={[styles.button, styles.registerButton]}
               contentStyle={{ height: 50 }}
               labelStyle={{ fontWeight: 'bold' }}
@@ -129,7 +131,7 @@ const LoginView = () => {
               REGISTER
             </Button>
 
-            <TouchableOpacity onPress={() => console.log('Forgot password pressed')} style={styles.forgotSection}>
+            <TouchableOpacity onPress={() => console.log(data)} style={styles.forgotSection}>
               <Text style={styles.forgotText}>If you forgot your password click here</Text>
             </TouchableOpacity>
           </View>

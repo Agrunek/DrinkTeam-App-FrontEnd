@@ -40,7 +40,7 @@
   }
    */
   @font-face {
-    src: url('/node_modules/react-native-vector-icons/MaterialCommunityIcons.ttf');
+    src: url('../../../node_modules/react-native-vector-icons/MaterialCommunityIcons.ttf');
     font-family: "MaterialCommunityIcons";
   }
   

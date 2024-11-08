@@ -13,6 +13,7 @@
     "react-native-svg": "*",
     "react-native-screens": "*",
     "react-native-gesture-handler": "*",
-    "react-native-reanimated": "*"
+    "react-native-reanimated": "*",
+    "react-native-vector-icons": "^10.2.0"
   }
 }

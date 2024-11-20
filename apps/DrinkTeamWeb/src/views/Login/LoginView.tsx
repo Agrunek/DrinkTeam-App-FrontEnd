@@ -113,7 +113,7 @@ const LoginView = () => {
 
             <Button
               mode="contained-tonal"
-              onPress={() => navigation.navigate('Recipies')}
+              onPress={() => navigation.navigate('Recipes')}
               style={styles.button}
               contentStyle={{ height: 70 }}
               labelStyle={{ fontWeight: 'bold' }}
@@ -123,7 +123,7 @@ const LoginView = () => {
 
             <Button
               mode="outlined"
-              onPress={() => navigation.navigate('Recipies')}
+              onPress={() => navigation.navigate('Recipes')}
               style={[styles.button, styles.registerButton]}
               contentStyle={{ height: 50 }}
               labelStyle={{ fontWeight: 'bold' }}

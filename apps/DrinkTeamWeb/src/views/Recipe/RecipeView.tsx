@@ -3,6 +3,7 @@ import type { MD3Colors } from 'react-native-paper/lib/typescript/types';
 import React, { useState } from 'react';
 import { StyleSheet, View, ScrollView } from 'react-native';
 import { useTheme, Button, Text } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface ItemData {
   name: string;
@@ -120,14 +121,7 @@ const RecipeView = () => {
                 <Text style={style.headerTitle}>{DATA.name}</Text>
                 <View style={style.headerRating}>
                   {[...Array(DATA.rating).keys()].map((id) => (
-                    <View
-                      key={id}
-                      style={{
-                        backgroundColor: '#FFE600',
-                        width: 15,
-                        height: 15,
-                      }}
-                    />
+                    <Icon key={id} name="star" size={25} color="gold" />
                   ))}
                   <Text style={style.headerVotes}>({DATA.votes})</Text>
                 </View>

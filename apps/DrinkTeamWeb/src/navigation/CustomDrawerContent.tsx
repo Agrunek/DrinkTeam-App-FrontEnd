@@ -11,18 +11,26 @@ function CustomDrawerContent(props) {
     <DrawerContentScrollView {...props} style={{ backgroundColor: theme.colors.background }}>
       <DrawerItem
         label="Login"
-        onPress={() => props.navigation.navigate('Login')}
+        onPress={() => navigation.navigate('Login')}
         labelStyle={{
           color: activeRoute === 'Login' ? theme.colors.primary : "white",
           fontWeight: activeRoute === 'Login' ? 'bold' : 'normal',
         }}
       />
       <DrawerItem
-        label="Recipies"
-        onPress={() => props.navigation.navigate('Recipies')}
+        label="Recipes"
+        onPress={() => navigation.navigate('Recipes')}
         labelStyle={{
-          color: activeRoute === 'Recipies' ? theme.colors.primary : "white",
-          fontWeight: activeRoute === 'Recipies' ? 'bold' : 'normal',
+          color: activeRoute === 'Recipes' ? theme.colors.primary : "white",
+          fontWeight: activeRoute === 'Recipes' ? 'bold' : 'normal',
+        }}
+      />
+      <DrawerItem
+        label="Recipe"
+        onPress={() => navigation.navigate('Recipe')}
+        labelStyle={{
+          color: activeRoute === 'Recipe' ? theme.colors.primary : "white",
+          fontWeight: activeRoute === 'Recipe' ? 'bold' : 'normal',
         }}
       />
     </DrawerContentScrollView>

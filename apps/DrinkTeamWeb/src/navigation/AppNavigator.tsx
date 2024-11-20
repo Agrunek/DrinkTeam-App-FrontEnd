@@ -5,6 +5,7 @@ import LoginView from '../views/Login/LoginView';
 import { useTheme } from 'react-native-paper';
 import SearchView from '../views/Search/SearchView';
 import CustomDrawerContent from './CustomDrawerContent';
+import RecipeView from '../views/Recipe/RecipeView';
 
 const Drawer = createDrawerNavigator();
 
@@ -38,9 +39,14 @@ const AppNavigator = () => {
           options={{ title: 'Login' }} 
         />
         <Drawer.Screen 
-          name="Recipies" 
+          name="Recipes" 
           component={SearchView} 
-          options={{ title: 'Recipies' }}
+          options={{ title: 'Recipes' }}
+        />
+         <Drawer.Screen 
+          name="Recipe" 
+          component={RecipeView} 
+          options={{ title: 'Recipe' }}
         />
       </Drawer.Navigator>
     </NavigationContainer>

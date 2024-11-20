@@ -2,7 +2,9 @@ import type { MD3Colors } from 'react-native-paper/lib/typescript/types';
 
 import React from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
-import { useTheme, Text, TextInput, Icon } from 'react-native-paper';
+import { useTheme, Text, TextInput, Icon as PaperIcon} from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+
 
 interface ItemData {
   id: number;
@@ -63,10 +65,7 @@ const SearchView = () => {
           <Text style={style.listItemName}>{name}</Text>
           <View style={style.listItemRating}>
             {[...Array(rating).keys()].map((id) => (
-              <View
-                key={id}
-                style={{ backgroundColor: '#FFE600', width: 10, height: 10 }}
-              />
+                 <Icon key={id} name="star" size={25} color="gold" />
             ))}
           </View>
           <Text style={style.listItemDifficulty}>{difficulty}</Text>
@@ -82,7 +81,7 @@ const SearchView = () => {
         <Text style={style.headerText}>Szukaj</Text>
         <TextInput
           mode="outlined"
-          left={<Icon source="magnify" size={14} />}
+          left={<PaperIcon source="magnify" size={14} />}
           outlineStyle={style.headerSearchOutline}
           style={style.headerSearch}
           textColor={colors.onBackground}

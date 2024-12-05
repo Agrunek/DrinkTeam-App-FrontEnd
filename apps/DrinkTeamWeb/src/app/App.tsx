@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Provider as PaperProvider } from 'react-native-paper';
 import theme from '../theme';
 import AppNavigator from '../navigation/AppNavigator';
+import { AuthProvider } from '../middleware/AuthContext';
 
 const queryClient = new QueryClient();
 
@@ -11,7 +12,9 @@ export const App = () => {
   return (
     <PaperProvider theme={theme}>
       <QueryClientProvider client={queryClient}>
-        <AppNavigator />
+        <AuthProvider>
+          <AppNavigator />
+        </AuthProvider>
       </QueryClientProvider>
     </PaperProvider>
   );

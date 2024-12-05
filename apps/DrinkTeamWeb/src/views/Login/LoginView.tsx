@@ -1,15 +1,30 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { TextInput, Button, useTheme, Text } from 'react-native-paper';
-import { useTest } from '../../middleware/queries';
+import { useAuthContext } from '../../middleware/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 
 const LoginView = () => {
+  const {register, login} = useAuthContext()
   const theme = useTheme();
   const { colors } = theme;
-  const [testStr, setTestStr] = useState('');
-  const { data } = useTest(testStr);
   const navigation = useNavigation();
+
+  const handleLogin = async () => {
+    try {
+      await login({ email, password });
+    } catch (err) {
+      setError('Login failed. Please try again.');
+    }
+  };
+
+  const handleRegister = async () => {
+    try {
+      await login({ email, password });
+    } catch (err) {
+      setError('Login failed. Please try again.');
+    }
+  };
 
   const styles = StyleSheet.create({
     container: {
@@ -131,7 +146,7 @@ const LoginView = () => {
               REGISTER
             </Button>
 
-            <TouchableOpacity onPress={() => console.log(data)} style={styles.forgotSection}>
+            <TouchableOpacity onPress={() => console.log("")} style={styles.forgotSection}>
               <Text style={styles.forgotText}>If you forgot your password click here</Text>
             </TouchableOpacity>
           </View>

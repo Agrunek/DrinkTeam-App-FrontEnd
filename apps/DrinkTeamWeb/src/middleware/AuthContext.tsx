@@ -7,12 +7,13 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const login = async (credentials) => {
-    const token = await signIn(credentials);
-    setIsAuthenticated(!!token);
+    const {access_token, status} = await signIn(credentials);
+    setIsAuthenticated(!!access_token);
+    return status;
   };
 
   const register = async (user) => {
-    const reposnse = await signUp(user);
+    return await signUp(user);
   }; 
 
   const logout = async () => {

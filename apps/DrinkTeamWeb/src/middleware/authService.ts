@@ -2,16 +2,30 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axiosClient from './axiosClient';
 
 export const signUp = async (userData) => {
-  const response = await axiosClient.post('/user/register', userData);
-  return response.data;
+  let response;
+  try{
+    response = await axiosClient.post('/user/register', userData);
+  }catch(err){
+    console.log(err)
+    return null;
+  }
+  
+  return response.status;
 };
 
 export const signIn = async (credentials) => {
-  const response = await axiosClient.post('/user/login', credentials);
-  const { token } = response.data;
+  let response;
+  try{
+    response = await axiosClient.post('/user/login', credentials);
+  }catch(err){
+    console.log(err)
+    return null;
+  }
+  const { access_token } = response.data;
+  const { status } = response;
+  await AsyncStorage.setItem('token', access_token);
 
-  await AsyncStorage.setItem('token', token);
-  return token;
+  return {status, access_token};
 };
 
 export const signOut = async () => {

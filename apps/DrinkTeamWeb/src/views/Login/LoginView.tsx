@@ -3,27 +3,25 @@ import { View, StyleSheet, TouchableOpacity, ScrollView, KeyboardAvoidingView, P
 import { TextInput, Button, useTheme, Text } from 'react-native-paper';
 import { useAuthContext } from '../../middleware/AuthContext';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginView = () => {
   const {register, login} = useAuthContext()
   const theme = useTheme();
   const { colors } = theme;
   const navigation = useNavigation();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
-    try {
-      await login({ email, password });
-    } catch (err) {
-      setError('Login failed. Please try again.');
+    const status = await login({ username_or_email: email, password: password });
+    if(status === 200) {
+      navigation.navigate('Recipes')
     }
-  };
+  }
 
   const handleRegister = async () => {
-    try {
-      await login({ email, password });
-    } catch (err) {
-      setError('Login failed. Please try again.');
-    }
+    const status = await register({ username: "123", email: email, password: password, date_of_birth: "2002-09-20 10:27:21.240752" });
   };
 
   const styles = StyleSheet.create({
@@ -112,13 +110,14 @@ const LoginView = () => {
             <Text style={styles.loginText}>Login</Text>
 
             <TextInput
-              onChangeText={(text) => setTestStr(text)}
+              onChangeText={(text) => setEmail(text)}
               label="Login / Mail"
               mode="outlined"
               textColor={colors.primary}
               style={styles.input}
             />
             <TextInput
+              onChangeText={(text) => setPassword(text)}
               label="Password"
               mode="outlined"
               textColor={colors.primary}
@@ -128,7 +127,7 @@ const LoginView = () => {
 
             <Button
               mode="contained-tonal"
-              onPress={() => navigation.navigate('Recipes')}
+              onPress={() => handleLogin()}
               style={styles.button}
               contentStyle={{ height: 70 }}
               labelStyle={{ fontWeight: 'bold' }}
@@ -138,7 +137,7 @@ const LoginView = () => {
 
             <Button
               mode="outlined"
-              onPress={() => navigation.navigate('Recipes')}
+              onPress={() => handleRegister()}
               style={[styles.button, styles.registerButton]}
               contentStyle={{ height: 50 }}
               labelStyle={{ fontWeight: 'bold' }}

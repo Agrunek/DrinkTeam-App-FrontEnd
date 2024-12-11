@@ -137,6 +137,12 @@ const SearchView = () => {
           keyExtractor={(item) => item.id.toString()}
         />
       )}
+      <TouchableOpacity
+        style={style.addButton}
+        onPress={() => navigation.navigate('AddRecipe')}
+      >
+        <Text style={style.addButtonText}>+</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -204,6 +210,24 @@ const styles = (colors: MD3Colors) => {
     listItemDuration: {
       color: '#FFFFFF',
       fontSize: 12,
+    },
+    addButton: {
+      position: 'absolute',
+      margin: 16,
+      right: 0,
+      bottom: 0,
+      width: 60,
+      height: 60,
+      borderRadius: 30,
+      backgroundColor: colors.primary,
+      justifyContent: 'center',
+      alignItems: 'center',
+      elevation: 5,
+    },
+    addButtonText: {
+      color: '#FFFFFF',
+      fontSize: 24,
+      fontWeight: 'bold',
     },
   });
 };

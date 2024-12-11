@@ -1,9 +1,57 @@
 import type { MD3Colors } from 'react-native-paper/lib/typescript/types';
 
 import React, { useState } from 'react';
-import { StyleSheet, View, ScrollView } from 'react-native';
+import { Image, StyleSheet, View, ScrollView } from 'react-native';
 import { useTheme, Button, Text } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useExtra } from '../../middleware/queries';
+import { mapTimeToText } from '../../utils/time';
+
+interface ItemDataAPI {
+  recipe_id: number;
+  name: string;
+  image_url: string;
+  preparation_time: number;
+  creation_time: string;
+  last_modified: string;
+  description: string;
+  alcohol_content: number;
+  average_rating: number;
+  number_of_reviews: number;
+  difficulty: number;
+  category: {
+    category_id: number;
+    name: string;
+    description: string;
+  };
+  user: {
+    user_id: number;
+    username: string;
+    email: string;
+    date_of_birth: string;
+    creation_date: string;
+  };
+}
+
+interface ItemExtraAPI {
+  ingredients: {
+    ingredient: {
+      ingredient_id: number;
+      name: string;
+      type: string;
+    };
+    quantity: number;
+    unit: string;
+  }[];
+  steps: {
+    step: {
+      name: string;
+      description: string;
+      step_number: number;
+      duration: number;
+    };
+  }[];
+}
 
 interface ItemData {
   name: string;
@@ -11,46 +59,63 @@ interface ItemData {
   rating: number;
   votes: number;
   difficulty: string;
-  duration: string;
-  ingredients: string[];
-  steps: string[];
+  duration: number;
+  image: string;
+  ingredients: {
+    name: string;
+    quantity: number;
+    unit: string;
+  }[];
+  steps: {
+    name: string;
+    description: string;
+    duration: number;
+  }[];
   currentStep: number;
 }
 
-const DATA: ItemData = {
-  name: 'Nalewka z jabłka',
-  description:
-    'Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quas, a!',
-  rating: 5,
-  votes: 26,
-  difficulty: 'Łatwe',
-  duration: '2 miesiące',
-  ingredients: [
-    'First ingredient',
-    'Second ingredient',
-    'Third ingredient',
-    'Fourth ingredient',
-    'Fifth ingredient',
-  ],
-  steps: [
-    'First step. Lorem ipsum dolor sit amet consectetur, adipisicing elit. At, quaerat nemo. Quisquam, nulla quo laboriosam saepe voluptate natus illum amet molestias autem odio excepturi nihil tempore similique earum beatae aut commodi debitis omnis maxime sint expedita! At eveniet nesciunt, eligendi exercitationem harum autem perspiciatis iusto, ea, fugiat quas aut repellendus.',
-    'Second step.',
-    'Third step.',
-    'Fourth step.',
-    'Fifth step.',
-  ],
-  currentStep: 2,
-};
-
-const RecipeView = () => {
+const RecipeView = ({ route }) => {
   const { colors } = useTheme();
   const [inProgress, setInProgress] = useState(false);
-  const [currentStep, setCurrentStep] = useState(DATA.currentStep);
+  const data = route.params as ItemDataAPI;
+  const { data: extra } = useExtra<ItemExtraAPI>(data?.recipe_id || -1);
 
   const style = styles(colors);
 
+  const recipe = {
+    name: data?.name || 'Loading...',
+    description: data?.description || 'Loading...',
+    rating: Math.floor(data?.average_rating || 0),
+    votes: data?.number_of_reviews,
+    difficulty: {
+      1: 'Banalne',
+      2: 'Łatwe',
+      3: 'Średnie',
+      4: 'Trudne',
+      5: 'Ekstremalne',
+    }[data?.difficulty || 0],
+    image: data?.image_url,
+    ingredients: extra?.ingredients?.map((item) => ({
+      name: item.ingredient.name,
+      quantity: item.quantity,
+      unit: item.unit,
+    })),
+    steps: extra?.steps?.map((item) => ({
+      name: item.step.name,
+      description: item.step.description,
+      duration: item.step.duration,
+    })),
+    duration: data?.preparation_time,
+    currentStep: 0,
+  } as ItemData;
+
+  const [currentStep, setCurrentStep] = useState(recipe.currentStep);
+
   return (
     <View style={style.container}>
+      <View style={style.backgroundImage}>
+        <Image style={{ height: '100%' }} source={{ uri: recipe.image }} />
+      </View>
       <View style={style.body}>
         {inProgress ? (
           <>
@@ -61,17 +126,17 @@ const RecipeView = () => {
                   adjustsFontSizeToFit={true}
                   numberOfLines={1}
                 >
-                  {DATA.name}
+                  {recipe.name}
                 </Text>
                 <Text
                   style={style.inProgressDescription}
                   adjustsFontSizeToFit={true}
                   numberOfLines={2}
                 >
-                  {DATA.description}
+                  {recipe.description}
                 </Text>
               </View>
-              {DATA.steps.map((description, index) => (
+              {recipe.steps.map((step, index) => (
                 <View
                   key={index}
                   style={{
@@ -91,7 +156,7 @@ const RecipeView = () => {
                   </View>
                   <View style={style.inProgressContentItemDescription}>
                     <Text style={style.inProgressContentItemDescriptionText}>
-                      {description}
+                      {step.description}
                     </Text>
                   </View>
                 </View>
@@ -118,24 +183,25 @@ const RecipeView = () => {
           <>
             <ScrollView>
               <View style={style.header}>
-                <Text style={style.headerTitle}>{DATA.name}</Text>
+                <Text style={style.headerTitle}>{recipe.name}</Text>
                 <View style={style.headerRating}>
-                  {[...Array(DATA.rating).keys()].map((id) => (
+                  {[...Array(recipe.rating).keys()].map((id) => (
                     <Icon key={id} name="star" size={25} color="gold" />
                   ))}
-                  <Text style={style.headerVotes}>({DATA.votes})</Text>
+                  <Text style={style.headerVotes}>({recipe.votes})</Text>
                 </View>
-                <Text style={style.headerDifficulty}>{DATA.difficulty}</Text>
+                <Text style={style.headerDifficulty}>{recipe.difficulty}</Text>
                 <Text style={style.headerDuration}>
-                  Czas trwania: {DATA.duration}
+                  Czas trwania: {mapTimeToText(recipe.duration)}
                 </Text>
               </View>
               <View style={style.ingredients}>
                 <Text style={style.ingredientsTitle}>Potrzebne składniki</Text>
                 <View style={style.ingredientsContent}>
-                  {DATA.ingredients.map((ingredient, index) => (
+                  {recipe.ingredients?.map((ingredient, index) => (
                     <Text style={style.ingredientsContentText} key={index}>
-                      {'\u2022'} {ingredient}
+                      {'\u2022'}{' '}
+                      {`${ingredient.name} ${ingredient.quantity} ${ingredient.unit}`}
                     </Text>
                   ))}
                 </View>
@@ -143,9 +209,9 @@ const RecipeView = () => {
               <View style={style.steps}>
                 <Text style={style.stepsTitle}>Kroki</Text>
                 <View style={style.stepsContent}>
-                  {DATA.steps.map((step, index) => (
+                  {recipe.steps?.map((step, index) => (
                     <Text style={style.stepsContentText} key={index}>
-                      {index + 1}. {step}
+                      {index + 1}. {step.name}
                     </Text>
                   ))}
                 </View>
@@ -172,7 +238,12 @@ const styles = (colors: MD3Colors) => {
   return StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: 'white',
+      position: 'relative',
+    },
+    backgroundImage: {
+      position: 'absolute',
+      height: 300,
+      width: '100%',
     },
     body: {
       flex: 1,
@@ -250,6 +321,7 @@ const styles = (colors: MD3Colors) => {
     inProgressHeader: {
       gap: 10,
       marginHorizontal: 20,
+      marginBottom: 20,
     },
     inProgressContent: {},
     inProgressName: {

@@ -1,77 +1,115 @@
 import type { MD3Colors } from 'react-native-paper/lib/typescript/types';
 
 import React from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
-import { useTheme, Text, TextInput, Icon as PaperIcon} from 'react-native-paper';
+import {
+  Image,
+  View,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+} from 'react-native';
+import { useTheme, Text, TextInput } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useSearch } from '../../middleware/queries';
+import { useNavigation } from '@react-navigation/native';
+import { mapTimeToText } from '../../utils/time';
 
+interface ItemDataAPI {
+  recipe_id: number;
+  name: string;
+  image_url: string;
+  preparation_time: number;
+  creation_time: string;
+  last_modified: string;
+  description: string;
+  alcohol_content: number;
+  average_rating: number;
+  number_of_reviews: number;
+  difficulty: number;
+  category: {
+    category_id: number;
+    name: string;
+    description: string;
+  };
+  user: {
+    user_id: number;
+    username: string;
+    email: string;
+    date_of_birth: string;
+    creation_date: string;
+  };
+}
 
 interface ItemData {
   id: number;
   name: string;
   rating: number;
   difficulty: string;
-  duration: string;
+  duration: number;
+  image: string;
 }
-
-const DATA: ItemData[] = [
-  {
-    id: 1,
-    name: 'Nalewka z jabłka',
-    rating: 5,
-    difficulty: 'Łatwe',
-    duration: '2 miesiące',
-  },
-  {
-    id: 2,
-    name: 'Nalewka z babka',
-    rating: 5,
-    difficulty: 'Łatwe',
-    duration: '2 miesiące',
-  },
-  {
-    id: 3,
-    name: 'Nalewka z dziadka',
-    rating: 5,
-    difficulty: 'Łatwe',
-    duration: '2 miesiące',
-  },
-  {
-    id: 4,
-    name: 'Nalewka z kawka',
-    rating: 5,
-    difficulty: 'Łatwe',
-    duration: '2 miesiące',
-  },
-  {
-    id: 5,
-    name: 'Nalewka z klatka',
-    rating: 5,
-    difficulty: 'Łatwe',
-    duration: '2 miesiące',
-  },
-];
 
 const SearchView = () => {
   const { colors } = useTheme();
+  const { data, isLoading } = useSearch<ItemDataAPI[]>();
+  const navigation = useNavigation();
 
   const style = styles(colors);
 
-  const Item = ({ name, rating, difficulty, duration }: ItemData) => {
+  const translateData = (raw: ItemDataAPI[]) => {
+    if (!raw) return [];
+
+    return raw.map((api) => ({
+      id: api.recipe_id,
+      name: api.name,
+      rating: Math.floor(api.average_rating || 0),
+      difficulty: {
+        1: 'Banalne',
+        2: 'Łatwe',
+        3: 'Średnie',
+        4: 'Trudne',
+        5: 'Ekstremalne',
+      }[api.difficulty],
+      duration: api.preparation_time || 0,
+      image: api.image_url,
+    }));
+  };
+
+  const Item = ({
+    id,
+    name,
+    rating,
+    difficulty,
+    duration,
+    image,
+  }: ItemData) => {
     return (
-      <View style={style.listItemContainer}>
-        <View style={style.listItemImage}></View>
+      <TouchableOpacity
+        style={style.listItemContainer}
+        onPress={() => {
+          console.log(data?.find((item) => item.recipe_id === id));
+          navigation.navigate(
+            'Recipe',
+            data?.find((item) => item.recipe_id === id)
+          );
+        }}
+      >
+        <View style={style.listItemImage}>
+          <Image style={{ height: '100%' }} source={{ uri: image }} />
+        </View>
         <View style={style.listItemDescription}>
           <Text style={style.listItemName}>{name}</Text>
           <View style={style.listItemRating}>
             {[...Array(rating).keys()].map((id) => (
-                 <Icon key={id} name="star" size={25} color="gold" />
+              <Icon key={id} name="star" size={25} color="gold" />
             ))}
           </View>
           <Text style={style.listItemDifficulty}>{difficulty}</Text>
-          <Text style={style.listItemDuration}>Czas trwania: {duration}</Text>
+          <Text style={style.listItemDuration}>
+            Czas trwania: {mapTimeToText(duration)}
+          </Text>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -81,7 +119,7 @@ const SearchView = () => {
         <Text style={style.headerText}>Szukaj</Text>
         <TextInput
           mode="outlined"
-          left={<PaperIcon source="magnify" size={14} />}
+          left={<TextInput.Icon icon="magnify" color="#FFFFFF" />}
           outlineStyle={style.headerSearchOutline}
           style={style.headerSearch}
           textColor={colors.onBackground}
@@ -89,12 +127,16 @@ const SearchView = () => {
           placeholderTextColor="#9586A8"
         />
       </View>
-      <FlatList
-        style={style.listContainer}
-        data={DATA}
-        renderItem={({ item }) => <Item {...item} />}
-        keyExtractor={(item) => item.id.toString()}
-      ></FlatList>
+      {isLoading ? (
+        <Text style={style.headerText}>LOADING...</Text>
+      ) : (
+        <FlatList
+          style={style.listContainer}
+          data={translateData(data)}
+          renderItem={({ item }) => <Item {...item} />}
+          keyExtractor={(item) => item.id.toString()}
+        />
+      )}
     </View>
   );
 };
@@ -117,7 +159,6 @@ const styles = (colors: MD3Colors) => {
     },
     headerSearch: {
       backgroundColor: '#23232C',
-      paddingHorizontal: 10,
       fontSize: 14,
       height: 50,
     },
@@ -139,8 +180,8 @@ const styles = (colors: MD3Colors) => {
       marginVertical: 10,
     },
     listItemImage: {
-      backgroundColor: 'white',
       flex: 2,
+      overflow: 'hidden',
     },
     listItemDescription: {
       flex: 3,

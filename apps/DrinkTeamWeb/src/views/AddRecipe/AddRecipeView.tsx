@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, PermissionsAndroid } from 'react-native';
 import { TextInput, Button, useTheme, Text } from 'react-native-paper';
+import { launchImageLibrary } from 'react-native-image-picker'; 
 import { useNavigation } from '@react-navigation/native';
+
+
 
 const AddRecipeView = () => {
   const { colors } = useTheme();
@@ -19,6 +22,32 @@ const AddRecipeView = () => {
     setSteps(updatedSteps);
   };
 
+  console.log('launchImageLibrary:', launchImageLibrary);
+  
+  const pickImage = () => {
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+        selectionLimit: 1,
+      },
+      (response) => {
+        if (response.didCancel) {
+          console.log('User cancelled image picker');
+        } else if (response.errorCode) {
+          console.log('Image Picker Error: ', response.errorMessage);
+        } else {
+          const asset = response.assets ? response.assets[0] : null;
+          if (asset && asset.uri) {
+            setImage(asset.uri);
+          } else {
+            console.log('No image selected or invalid response');
+          }
+        }
+      }
+    );
+  };
+  
+  
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -105,10 +134,10 @@ const AddRecipeView = () => {
 
           <TouchableOpacity
             style={styles.input}
-            onPress={() => console.log('Add Image')}
+            onPress={pickImage}
           >
             <Text style={{ textAlign: 'center', color: colors.onBackground }}>
-              {image || 'Add image by clicking here'}
+              {image ? `Selected Image: ${image}` : 'Add image by clicking here'}
             </Text>
           </TouchableOpacity>
 
@@ -123,7 +152,6 @@ const AddRecipeView = () => {
                   label={`Step ${index + 1}`}
                   mode="outlined"
                   style={styles.stepInput}
-                  textColor={colors.primary}
                   value={step}
                   onChangeText={(text) => updateStep(index, text)}
                 />

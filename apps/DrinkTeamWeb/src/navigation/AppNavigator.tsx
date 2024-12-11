@@ -6,6 +6,7 @@ import { useTheme } from 'react-native-paper';
 import SearchView from '../views/Search/SearchView';
 import CustomDrawerContent from './CustomDrawerContent';
 import RecipeView from '../views/Recipe/RecipeView';
+import AddRecipeView from '../views/AddRecipe/AddRecipeView';
 
 const Drawer = createDrawerNavigator();
 
@@ -47,6 +48,11 @@ const AppNavigator = () => {
           name="Recipe" 
           component={RecipeView} 
           options={{ title: 'Recipe' }}
+        />
+        <Drawer.Screen 
+          name="addRecipe" 
+          component={AddRecipeView} 
+          options={{ title: 'addRecipe' }} 
         />
       </Drawer.Navigator>
     </NavigationContainer>

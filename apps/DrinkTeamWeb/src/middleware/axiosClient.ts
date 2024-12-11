@@ -1,5 +1,6 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import queryClient from './queryClient';
 
 const axiosClient = axios.create({
   baseURL: 'http://drink-team-backend.btdbb2gwh4ggakgx.germanywestcentral.azurecontainer.io:8080',
@@ -10,6 +11,7 @@ const axiosClient = axios.create({
 });
 
 axiosClient.interceptors.request.use(async (config) => {
+  queryClient.invalidateQueries('Auth');
   const token = await AsyncStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;

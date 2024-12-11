@@ -270,12 +270,12 @@ const RecipeView = ({ route }) => {
                 onPress={() => {
                   scheduleNotification(
                     recipe.id,
-                    recipe.steps[currentStep]?.duration || 10,
+                    recipe.steps[0]?.duration || 10,
                     'Here comes a next step...',
-                    recipe.steps[currentStep]?.name ||
-                      'No description provided...',
+                    recipe.steps[1]?.name || 'No description provided...',
                     { ...recipe, started: true }
                   );
+                  setCurrentStep(0);
                   setInProgress(true);
                 }}
               >

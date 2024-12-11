@@ -83,6 +83,8 @@ export const NotificationContextProvider = ({ children }) => {
       timestamp: date.getTime(),
     };
 
+    console.log(`Setting up a notification in ${seconds} seconds`);
+
     await notifee.createTriggerNotification(notification, trigger);
   };
 

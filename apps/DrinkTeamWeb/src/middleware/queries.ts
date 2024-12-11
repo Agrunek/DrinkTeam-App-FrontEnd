@@ -1,5 +1,5 @@
 import axiosClient from './axiosClient';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from 'react-query';
 
 export const fetchRecipies = async (searchString) => {
   const response = await axiosClient.get('/recipies', {

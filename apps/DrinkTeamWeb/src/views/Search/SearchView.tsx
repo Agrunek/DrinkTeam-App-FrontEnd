@@ -139,7 +139,7 @@ const SearchView = () => {
       )}
       <TouchableOpacity
         style={style.addButton}
-        onPress={() => navigation.navigate('AddRecipe')}
+        onPress={() => navigation.navigate('addRecipe')}
       >
         <Text style={style.addButtonText}>+</Text>
       </TouchableOpacity>

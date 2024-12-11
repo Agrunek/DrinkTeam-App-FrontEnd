@@ -1,11 +1,12 @@
 import type { MD3Colors } from 'react-native-paper/lib/typescript/types';
 
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Image, StyleSheet, View, ScrollView } from 'react-native';
 import { useTheme, Button, Text } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useExtra } from '../../middleware/queries';
 import { mapTimeToText } from '../../utils/time';
+import NotificationContext from '../../context/NotificationContext';
 
 interface ItemDataAPI {
   recipe_id: number;
@@ -54,6 +55,7 @@ interface ItemExtraAPI {
 }
 
 interface ItemData {
+  id: string;
   name: string;
   description: string;
   rating: number;
@@ -75,6 +77,8 @@ interface ItemData {
 }
 
 const RecipeView = ({ route }) => {
+  const { scheduleNotification, cancelNotification } =
+    useContext(NotificationContext);
   const { colors } = useTheme();
   const [inProgress, setInProgress] = useState(false);
   const data = route.params as ItemDataAPI;
@@ -83,6 +87,7 @@ const RecipeView = ({ route }) => {
   const style = styles(colors);
 
   const recipe = {
+    id: data?.recipe_id.toString() || '-1',
     name: data?.name || 'Loading...',
     description: data?.description || 'Loading...',
     rating: Math.floor(data?.average_rating || 0),
@@ -95,16 +100,18 @@ const RecipeView = ({ route }) => {
       5: 'Ekstremalne',
     }[data?.difficulty || 0],
     image: data?.image_url,
-    ingredients: extra?.ingredients?.map((item) => ({
-      name: item.ingredient.name,
-      quantity: item.quantity,
-      unit: item.unit,
-    })),
-    steps: extra?.steps?.map((item) => ({
-      name: item.step.name,
-      description: item.step.description,
-      duration: item.step.duration,
-    })),
+    ingredients:
+      extra?.ingredients?.map((item) => ({
+        name: item.ingredient.name,
+        quantity: item.quantity,
+        unit: item.unit,
+      })) || [],
+    steps:
+      extra?.steps?.map((item) => ({
+        name: item.step.name,
+        description: item.step.description,
+        duration: item.step.duration,
+      })) || [],
     duration: data?.preparation_time,
     currentStep: 0,
   } as ItemData;
@@ -136,7 +143,7 @@ const RecipeView = ({ route }) => {
                   {recipe.description}
                 </Text>
               </View>
-              {recipe.steps.map((step, index) => (
+              {recipe.steps?.map((step, index) => (
                 <View
                   key={index}
                   style={{
@@ -166,14 +173,29 @@ const RecipeView = ({ route }) => {
               <Button
                 style={style.backButton}
                 labelStyle={style.backButtonText}
-                onPress={() => setInProgress(false)}
+                onPress={() => {
+                  cancelNotification(recipe.id);
+                  setInProgress(false);
+                }}
               >
                 BACK
               </Button>
               <Button
                 style={style.startButton}
                 labelStyle={style.startButtonText}
-                onPress={() => setCurrentStep((prev) => prev + 1)}
+                onPress={() => {
+                  setCurrentStep((prev) => {
+                    const newStep = prev + 1;
+                    scheduleNotification(
+                      recipe.id,
+                      recipe.steps[newStep]?.duration || 10,
+                      'Here comes a next step...',
+                      recipe.steps[newStep]?.name ||
+                        'No description provided...'
+                    );
+                    return newStep;
+                  });
+                }}
               >
                 NEXT STEP
               </Button>
@@ -185,7 +207,7 @@ const RecipeView = ({ route }) => {
               <View style={style.header}>
                 <Text style={style.headerTitle}>{recipe.name}</Text>
                 <View style={style.headerRating}>
-                  {[...Array(recipe.rating).keys()].map((id) => (
+                  {[...Array(recipe.rating).keys()]?.map((id) => (
                     <Icon key={id} name="star" size={25} color="gold" />
                   ))}
                   <Text style={style.headerVotes}>({recipe.votes})</Text>
@@ -218,11 +240,22 @@ const RecipeView = ({ route }) => {
               </View>
             </ScrollView>
             <View style={style.options}>
-              <Button style={style.followButton}>{'<3'}</Button>
+              <Button style={style.followButton}>
+                <Icon name="cards-heart" size={20} />
+              </Button>
               <Button
                 style={style.startButton}
                 labelStyle={style.startButtonText}
-                onPress={() => setInProgress(true)}
+                onPress={() => {
+                  scheduleNotification(
+                    recipe.id,
+                    recipe.steps[currentStep]?.duration || 10,
+                    'Here comes a next step...',
+                    recipe.steps[currentStep]?.name ||
+                      'No description provided...'
+                  );
+                  setInProgress(true);
+                }}
               >
                 START
               </Button>

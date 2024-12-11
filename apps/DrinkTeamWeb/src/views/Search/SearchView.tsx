@@ -1,6 +1,6 @@
 import type { MD3Colors } from 'react-native-paper/lib/typescript/types';
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Image,
   View,
@@ -51,7 +51,8 @@ interface ItemData {
 
 const SearchView = () => {
   const { colors } = useTheme();
-  const { data, isLoading } = useSearch<ItemDataAPI[]>();
+  const [searchTerm, setSearchTerm] = useState('');
+  const { data, isLoading } = useSearch<ItemDataAPI[]>(searchTerm);
   const navigation = useNavigation();
 
   const style = styles(colors);
@@ -123,6 +124,8 @@ const SearchView = () => {
           textColor={colors.onBackground}
           placeholder="Search"
           placeholderTextColor="#9586A8"
+          value={searchTerm}
+          onChangeText={setSearchTerm}
         />
       </View>
       {isLoading ? (
@@ -176,6 +179,7 @@ const styles = (colors: MD3Colors) => {
       flexDirection: 'row',
       overflow: 'hidden',
       marginVertical: 10,
+      height: 150,
     },
     listItemImage: {
       flex: 2,

@@ -87,11 +87,9 @@ const SearchView = () => {
       <TouchableOpacity
         style={style.listItemContainer}
         onPress={() => {
-          console.log(data?.find((item) => item.recipe_id === id));
-          navigation.navigate(
-            'Recipe',
-            data?.find((item) => item.recipe_id === id)
-          );
+          navigation.navigate('Recipe', {
+            search: data?.find((item) => item.recipe_id === id),
+          });
         }}
       >
         <View style={style.listItemImage}>

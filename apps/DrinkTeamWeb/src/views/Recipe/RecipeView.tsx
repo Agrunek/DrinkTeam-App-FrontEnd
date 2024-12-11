@@ -74,49 +74,64 @@ interface ItemData {
     duration: number;
   }[];
   currentStep: number;
+  started: boolean;
 }
 
 const RecipeView = ({ route }) => {
+  const { colors } = useTheme();
+  const style = styles(colors);
   const { scheduleNotification, cancelNotification } =
     useContext(NotificationContext);
-  const { colors } = useTheme();
-  const [inProgress, setInProgress] = useState(false);
-  const data = route.params as ItemDataAPI;
-  const { data: extra } = useExtra<ItemExtraAPI>(data?.recipe_id || -1);
+  const { noti, search } =
+    route.params ||
+    ({} as {
+      noti?: ItemData;
+      search?: ItemDataAPI;
+    });
+  const { data: extra } = useExtra<ItemExtraAPI>(
+    search?.recipe_id || Number(noti?.id) || -1
+  );
 
-  const style = styles(colors);
+  const [currentStep, setCurrentStep] = useState(noti?.currentStep || 0);
+  const [inProgress, setInProgress] = useState(noti?.started || false);
 
-  const recipe = {
-    id: data?.recipe_id.toString() || '-1',
-    name: data?.name || 'Loading...',
-    description: data?.description || 'Loading...',
-    rating: Math.floor(data?.average_rating || 0),
-    votes: data?.number_of_reviews,
-    difficulty: {
-      1: 'Banalne',
-      2: 'Łatwe',
-      3: 'Średnie',
-      4: 'Trudne',
-      5: 'Ekstremalne',
-    }[data?.difficulty || 0],
-    image: data?.image_url,
+  const recipe: ItemData = {
+    id: (search?.recipe_id || Number(noti?.id) || -1).toString(),
+    name: search?.name || noti?.name || 'Loading...',
+    description: search?.description || noti?.description || 'Loading...',
+    rating: search?.average_rating || noti?.rating || 0,
+    votes: search?.number_of_reviews || noti?.votes || 0,
+    difficulty:
+      {
+        1: 'Banalne',
+        2: 'Łatwe',
+        3: 'Średnie',
+        4: 'Trudne',
+        5: 'Ekstremalne',
+      }[search?.difficulty] ||
+      noti?.difficulty ||
+      'Loading...',
+    duration: search?.preparation_time || noti?.duration || 0,
+    image: search?.image_url || noti?.image || '',
     ingredients:
       extra?.ingredients?.map((item) => ({
-        name: item.ingredient.name,
-        quantity: item.quantity,
-        unit: item.unit,
-      })) || [],
+        name: item.ingredient?.name || '',
+        quantity: item.quantity || 0,
+        unit: item.unit || '',
+      })) ||
+      noti?.ingredients ||
+      [],
     steps:
       extra?.steps?.map((item) => ({
-        name: item.step.name,
-        description: item.step.description,
-        duration: item.step.duration,
-      })) || [],
-    duration: data?.preparation_time,
-    currentStep: 0,
-  } as ItemData;
-
-  const [currentStep, setCurrentStep] = useState(recipe.currentStep);
+        name: item.step?.name || '',
+        description: item.step?.description || '',
+        duration: item.step?.duration || 0,
+      })) ||
+      noti?.steps ||
+      [],
+    currentStep: currentStep,
+    started: inProgress,
+  };
 
   return (
     <View style={style.container}>
@@ -184,7 +199,8 @@ const RecipeView = ({ route }) => {
                         recipe.id,
                         recipe.steps[newStep]?.duration || 10,
                         'Here comes a next step...',
-                        recipe.steps[newStep + 1]?.name || 'We are done!'
+                        recipe.steps[newStep + 1]?.name || 'We are done!',
+                        recipe
                       );
                       return newStep;
                     });
@@ -203,7 +219,8 @@ const RecipeView = ({ route }) => {
                       recipe.id,
                       recipe.steps[newStep]?.duration || 10,
                       'Here comes a next step...',
-                      recipe.steps[newStep + 1]?.name || 'We are done!'
+                      recipe.steps[newStep + 1]?.name || 'We are done!',
+                      recipe
                     );
                     return newStep;
                   });
@@ -264,7 +281,8 @@ const RecipeView = ({ route }) => {
                     recipe.steps[currentStep]?.duration || 10,
                     'Here comes a next step...',
                     recipe.steps[currentStep]?.name ||
-                      'No description provided...'
+                      'No description provided...',
+                    { ...recipe, name: 'Notification works!' }
                   );
                   setInProgress(true);
                 }}

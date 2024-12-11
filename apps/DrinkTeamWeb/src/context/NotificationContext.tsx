@@ -1,4 +1,5 @@
 import { createContext, useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import notifee, {
   Notification,
   Trigger,
@@ -9,7 +10,8 @@ type SNFunction = (
   id: string,
   seconds: number,
   title: string,
-  body: string
+  body: string,
+  data: object
 ) => Promise<void>;
 
 type CFunction = (id: string) => Promise<void>;
@@ -30,6 +32,9 @@ const NotificationContext = createContext(defaultNotificationContext);
 
 export const NotificationContextProvider = ({ children }) => {
   const [channelId, setChannelId] = useState('');
+  const { navigate } = useNavigation();
+
+  console.log('Notification Context Provider rendering...');
 
   const initNotifications = async () => {
     await notifee.requestPermission();
@@ -40,9 +45,21 @@ export const NotificationContextProvider = ({ children }) => {
     });
 
     setChannelId(channelId);
+
+    const initialNotification = await notifee.getInitialNotification();
+
+    if (initialNotification && navigate) {
+      navigate('Recipe', initialNotification.notification.data);
+    }
   };
 
-  const scheduleNotification: SNFunction = async (id, seconds, title, body) => {
+  const scheduleNotification: SNFunction = async (
+    id,
+    seconds,
+    title,
+    body,
+    data
+  ) => {
     await notifee.cancelNotification(id);
 
     const date = new Date(Date.now() + seconds * 1000);
@@ -51,6 +68,7 @@ export const NotificationContextProvider = ({ children }) => {
       id: id,
       title: title,
       body: body,
+      data: { noti: data },
       android: { channelId, pressAction: { id: 'default' } },
     };
 

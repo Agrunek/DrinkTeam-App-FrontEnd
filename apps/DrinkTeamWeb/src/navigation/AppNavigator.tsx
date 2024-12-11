@@ -6,6 +6,7 @@ import { useTheme } from 'react-native-paper';
 import SearchView from '../views/Search/SearchView';
 import CustomDrawerContent from './CustomDrawerContent';
 import RecipeView from '../views/Recipe/RecipeView';
+import { NotificationContextProvider } from '../context/NotificationContext';
 
 const Drawer = createDrawerNavigator();
 
@@ -14,41 +15,44 @@ const AppNavigator = () => {
 
   return (
     <NavigationContainer>
-      <Drawer.Navigator 
-      drawerContent={(props) => <CustomDrawerContent {...props} />}
-      initialRouteName="Login"
-      screenOptions={{
-        headerStyle: {
-          backgroundColor: theme.colors.primary,
-        },
-        headerTintColor: theme.colors.onPrimary,
-        drawerStyle: {
-          backgroundColor: theme.colors.background,
-        },
-        drawerActiveTintColor: theme.colors.primary,
-        drawerInactiveTintColor: theme.colors.onBackground,
-        drawerActiveBackgroundColor: theme.colors.secondaryContainer,
-        drawerLabelStyle: {
-          fontSize: 16,
-          fontWeight: 'bold',
-        },
-      }}>
-        <Drawer.Screen 
-          name="Login" 
-          component={LoginView} 
-          options={{ title: 'Login' }} 
-        />
-        <Drawer.Screen 
-          name="Recipes" 
-          component={SearchView} 
-          options={{ title: 'Recipes' }}
-        />
-         <Drawer.Screen 
-          name="Recipe" 
-          component={RecipeView} 
-          options={{ title: 'Recipe' }}
-        />
-      </Drawer.Navigator>
+      <NotificationContextProvider>
+        <Drawer.Navigator
+          drawerContent={(props) => <CustomDrawerContent {...props} />}
+          initialRouteName="Login"
+          screenOptions={{
+            headerStyle: {
+              backgroundColor: theme.colors.primary,
+            },
+            headerTintColor: theme.colors.onPrimary,
+            drawerStyle: {
+              backgroundColor: theme.colors.background,
+            },
+            drawerActiveTintColor: theme.colors.primary,
+            drawerInactiveTintColor: theme.colors.onBackground,
+            drawerActiveBackgroundColor: theme.colors.secondaryContainer,
+            drawerLabelStyle: {
+              fontSize: 16,
+              fontWeight: 'bold',
+            },
+          }}
+        >
+          <Drawer.Screen
+            name="Login"
+            component={LoginView}
+            options={{ title: 'Login' }}
+          />
+          <Drawer.Screen
+            name="Recipes"
+            component={SearchView}
+            options={{ title: 'Recipes' }}
+          />
+          <Drawer.Screen
+            name="Recipe"
+            component={RecipeView}
+            options={{ title: 'Recipe' }}
+          />
+        </Drawer.Navigator>
+      </NotificationContextProvider>
     </NavigationContainer>
   );
 };

@@ -1,4 +1,4 @@
-import { createContext, useState } from 'react';
+import { createContext, useState, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import notifee, {
   Notification,
@@ -36,22 +36,28 @@ export const NotificationContextProvider = ({ children }) => {
 
   console.log('Notification Context Provider rendering...');
 
-  const initNotifications = async () => {
-    await notifee.requestPermission();
+  useEffect(() => {
+    const initNotifications = async () => {
+      await notifee.requestPermission();
 
-    const channelId = await notifee.createChannel({
-      id: 'default',
-      name: 'Default Channel',
-    });
+      const channelId = await notifee.createChannel({
+        id: 'default',
+        name: 'Default Channel',
+      });
 
-    setChannelId(channelId);
+      setChannelId(channelId);
 
-    const initialNotification = await notifee.getInitialNotification();
+      const initialNotification = await notifee.getInitialNotification();
 
-    if (initialNotification && navigate) {
-      navigate('Recipe', initialNotification.notification.data);
-    }
-  };
+      if (initialNotification && navigate) {
+        navigate('Recipe', initialNotification.notification.data);
+      }
+    };
+
+    console.log('Initialize notifications...');
+
+    initNotifications();
+  }, [navigate]);
 
   const scheduleNotification: SNFunction = async (
     id,
@@ -89,8 +95,6 @@ export const NotificationContextProvider = ({ children }) => {
     scheduleNotification: scheduleNotification,
     cancelNotification: cancelNotification,
   };
-
-  initNotifications();
 
   return (
     <NotificationContext.Provider value={notificationContext}>

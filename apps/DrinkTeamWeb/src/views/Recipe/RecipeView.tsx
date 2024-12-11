@@ -82,12 +82,10 @@ const RecipeView = ({ route }) => {
   const style = styles(colors);
   const { scheduleNotification, cancelNotification } =
     useContext(NotificationContext);
-  const { noti, search } =
-    route.params ||
-    ({} as {
-      noti?: ItemData;
-      search?: ItemDataAPI;
-    });
+  const { noti, search } = (route.params || {}) as {
+    noti?: ItemData;
+    search?: ItemDataAPI;
+  };
   const { data: extra } = useExtra<ItemExtraAPI>(
     search?.recipe_id || Number(noti?.id) || -1
   );
@@ -193,17 +191,14 @@ const RecipeView = ({ route }) => {
                     cancelNotification(recipe.id);
                     setInProgress(false);
                   } else {
-                    setCurrentStep((prev) => {
-                      const newStep = prev - 1;
-                      scheduleNotification(
-                        recipe.id,
-                        recipe.steps[newStep]?.duration || 10,
-                        'Here comes a next step...',
-                        recipe.steps[newStep + 1]?.name || 'We are done!',
-                        recipe
-                      );
-                      return newStep;
-                    });
+                    scheduleNotification(
+                      recipe.id,
+                      recipe.steps[currentStep - 1]?.duration || 10,
+                      'Here comes a next step...',
+                      recipe.steps[currentStep]?.name || 'We are done!',
+                      { recipe, currentStep: currentStep - 1 }
+                    );
+                    setCurrentStep((prev) => prev - 1);
                   }
                 }}
               >
@@ -213,17 +208,14 @@ const RecipeView = ({ route }) => {
                 style={style.startButton}
                 labelStyle={style.startButtonText}
                 onPress={() => {
-                  setCurrentStep((prev) => {
-                    const newStep = prev + 1;
-                    scheduleNotification(
-                      recipe.id,
-                      recipe.steps[newStep]?.duration || 10,
-                      'Here comes a next step...',
-                      recipe.steps[newStep + 1]?.name || 'We are done!',
-                      recipe
-                    );
-                    return newStep;
-                  });
+                  scheduleNotification(
+                    recipe.id,
+                    recipe.steps[currentStep + 1]?.duration || 10,
+                    'Here comes a next step...',
+                    recipe.steps[currentStep + 2]?.name || 'We are done!',
+                    { recipe, currentStep: currentStep + 1 }
+                  );
+                  setCurrentStep((prev) => prev + 1);
                 }}
               >
                 NEXT STEP
@@ -282,7 +274,7 @@ const RecipeView = ({ route }) => {
                     'Here comes a next step...',
                     recipe.steps[currentStep]?.name ||
                       'No description provided...',
-                    { ...recipe, name: 'Notification works!' }
+                    { ...recipe, started: true }
                   );
                   setInProgress(true);
                 }}

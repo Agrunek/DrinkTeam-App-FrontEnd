@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import { TextInput, Button, useTheme, Text } from 'react-native-paper';
-import { useAuthContext } from '../../middleware/AuthContext';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '../../hooks/useAuth';
 
 const LoginView = () => {
-  const {register, login} = useAuthContext()
+  const {register, login} = useAuth()
   const theme = useTheme();
   const { colors } = theme;
   const navigation = useNavigation();

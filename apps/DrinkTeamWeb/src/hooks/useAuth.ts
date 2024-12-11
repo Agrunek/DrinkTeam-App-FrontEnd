@@ -1,8 +1,11 @@
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import jwtDecode from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode';
+import { signIn, signOut, signUp} from '../middleware/authService'
 
 export const useAuth = () => {
+  const queryClient = useQueryClient() ;
+
   const { data: user, isLoading } = useQuery(
     'auth',
     async () => {
@@ -17,8 +20,23 @@ export const useAuth = () => {
 
       return decodedToken;
     },
-    { staleTime: Infinity, cacheTime: Infinity }
+    { staleTime: 0, cacheTime: 30000 }
   );
 
-  return { user, isLoading };
+  const login = async (credentials) => {
+    const {status} = await signIn(credentials);
+    queryClient.invalidateQueries('auth');
+    return status;
+  };
+
+  const register = async (user) => {
+    return await signUp(user);
+  }; 
+
+  const logout = async () => {
+    await signOut();
+    queryClient.invalidateQueries('auth');
+  };
+
+  return { user, isLoading, login, logout, register };
 };

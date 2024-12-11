@@ -174,8 +174,21 @@ const RecipeView = ({ route }) => {
                 style={style.backButton}
                 labelStyle={style.backButtonText}
                 onPress={() => {
-                  cancelNotification(recipe.id);
-                  setInProgress(false);
+                  if (currentStep === 0) {
+                    cancelNotification(recipe.id);
+                    setInProgress(false);
+                  } else {
+                    setCurrentStep((prev) => {
+                      const newStep = prev - 1;
+                      scheduleNotification(
+                        recipe.id,
+                        recipe.steps[newStep]?.duration || 10,
+                        'Here comes a next step...',
+                        recipe.steps[newStep + 1]?.name || 'We are done!'
+                      );
+                      return newStep;
+                    });
+                  }
                 }}
               >
                 BACK
@@ -190,8 +203,7 @@ const RecipeView = ({ route }) => {
                       recipe.id,
                       recipe.steps[newStep]?.duration || 10,
                       'Here comes a next step...',
-                      recipe.steps[newStep]?.name ||
-                        'No description provided...'
+                      recipe.steps[newStep + 1]?.name || 'We are done!'
                     );
                     return newStep;
                   });

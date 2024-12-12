@@ -1,11 +1,18 @@
 import type { MD3Colors } from 'react-native-paper/lib/typescript/types';
 
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Image, StyleSheet, View, ScrollView } from 'react-native';
 import { useTheme, Button, Text } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useExtra } from '../../middleware/queries';
+import {
+  uploadReview,
+  useExtra,
+  useProgress,
+  postProgress,
+  putProgres,
+} from '../../middleware/queries';
 import { mapTimeToText } from '../../utils/time';
+import NotificationContext from '../../context/NotificationContext';
 
 interface ItemDataAPI {
   recipe_id: number;
@@ -53,7 +60,26 @@ interface ItemExtraAPI {
   }[];
 }
 
+interface UserProgressAPI {
+  user_progress_id: number;
+  started_date: string;
+  finished_date: string;
+  completed: boolean;
+  recipe_id: number;
+  user_id: number;
+  instruction_step: {
+    step: {
+      name: string;
+      description: string;
+      step_number: number;
+      duration: number;
+    };
+  };
+  detail?: string;
+}
+
 interface ItemData {
+  id: string;
   name: string;
   description: string;
   rating: number;
@@ -72,44 +98,79 @@ interface ItemData {
     duration: number;
   }[];
   currentStep: number;
+  started: boolean;
 }
 
 const RecipeView = ({ route }) => {
   const { colors } = useTheme();
-  const [inProgress, setInProgress] = useState(false);
-  const data = route.params as ItemDataAPI;
-  const { data: extra } = useExtra<ItemExtraAPI>(data?.recipe_id || -1);
-
   const style = styles(colors);
+  const { scheduleNotification, cancelNotification } =
+    useContext(NotificationContext);
+  const { noti, search } = (route.params || {}) as {
+    noti?: ItemData;
+    search?: ItemDataAPI;
+  };
+  const { data: extra } = useExtra<ItemExtraAPI>(
+    search?.recipe_id || Number(noti?.id) || 0
+  );
+  const { data: userProgress } = useProgress<UserProgressAPI[]>(
+    search?.recipe_id || Number(noti?.id) || 0
+  );
 
-  const recipe = {
-    name: data?.name || 'Loading...',
-    description: data?.description || 'Loading...',
-    rating: Math.floor(data?.average_rating || 0),
-    votes: data?.number_of_reviews,
-    difficulty: {
-      1: 'Banalne',
-      2: 'Łatwe',
-      3: 'Średnie',
-      4: 'Trudne',
-      5: 'Ekstremalne',
-    }[data?.difficulty || 0],
-    image: data?.image_url,
-    ingredients: extra?.ingredients?.map((item) => ({
-      name: item.ingredient.name,
-      quantity: item.quantity,
-      unit: item.unit,
-    })),
-    steps: extra?.steps?.map((item) => ({
-      name: item.step.name,
-      description: item.step.description,
-      duration: item.step.duration,
-    })),
-    duration: data?.preparation_time,
-    currentStep: 0,
-  } as ItemData;
+  const [inProgress, setInProgress] = useState(noti?.started || false);
+  const [currentStep, setCurrentStep] = useState(noti?.currentStep || 0);
 
-  const [currentStep, setCurrentStep] = useState(recipe.currentStep);
+  useEffect(() => {
+    const derivedStarted =
+      userProgress?.findIndex((item) => item.detail) === -1;
+    const derivedUserProgress = userProgress?.filter(
+      (item) => item.completed
+    ).length;
+
+    setInProgress(derivedStarted);
+    setCurrentStep(derivedUserProgress);
+  }, [userProgress]);
+
+  console.log(inProgress);
+  console.log(currentStep);
+
+  const recipe: ItemData = {
+    id: (search?.recipe_id || Number(noti?.id) || 0).toString(),
+    name: search?.name || noti?.name || 'Loading...',
+    description: search?.description || noti?.description || 'Loading...',
+    rating: Math.floor(search?.average_rating || noti?.rating || 0),
+    votes: search?.number_of_reviews || noti?.votes || 0,
+    difficulty:
+      {
+        1: 'Banalne',
+        2: 'Łatwe',
+        3: 'Średnie',
+        4: 'Trudne',
+        5: 'Ekstremalne',
+      }[search?.difficulty] ||
+      noti?.difficulty ||
+      'Loading...',
+    duration: search?.preparation_time || noti?.duration || 0,
+    image: search?.image_url || noti?.image || '',
+    ingredients:
+      extra?.ingredients?.map((item) => ({
+        name: item.ingredient?.name || '',
+        quantity: item.quantity || 0,
+        unit: item.unit || '',
+      })) ||
+      noti?.ingredients ||
+      [],
+    steps:
+      extra?.steps?.map((item) => ({
+        name: item.step?.name || '',
+        description: item.step?.description || '',
+        duration: item.step?.duration || 0,
+      })) ||
+      noti?.steps ||
+      [],
+    currentStep: currentStep,
+    started: inProgress,
+  };
 
   return (
     <View style={style.container}>
@@ -136,7 +197,7 @@ const RecipeView = ({ route }) => {
                   {recipe.description}
                 </Text>
               </View>
-              {recipe.steps.map((step, index) => (
+              {recipe.steps?.map((step, index) => (
                 <View
                   key={index}
                   style={{
@@ -166,14 +227,39 @@ const RecipeView = ({ route }) => {
               <Button
                 style={style.backButton}
                 labelStyle={style.backButtonText}
-                onPress={() => setInProgress(false)}
+                onPress={() => {
+                  if (currentStep === 0) {
+                    cancelNotification(recipe.id);
+                    setInProgress(false);
+                  } else {
+                    scheduleNotification(
+                      recipe.id,
+                      recipe.steps[currentStep - 1]?.duration || 10,
+                      'Here comes a next step...',
+                      recipe.steps[currentStep]?.name || 'We are done!',
+                      { recipe, currentStep: currentStep - 1 }
+                    );
+                    setCurrentStep((prev) => prev - 1);
+                    putProgres(Number(recipe.id), false);
+                  }
+                }}
               >
                 BACK
               </Button>
               <Button
                 style={style.startButton}
                 labelStyle={style.startButtonText}
-                onPress={() => setCurrentStep((prev) => prev + 1)}
+                onPress={() => {
+                  scheduleNotification(
+                    recipe.id,
+                    recipe.steps[currentStep + 1]?.duration || 10,
+                    'Here comes a next step...',
+                    recipe.steps[currentStep + 2]?.name || 'We are done!',
+                    { recipe, currentStep: currentStep + 1 }
+                  );
+                  setCurrentStep((prev) => prev + 1);
+                  putProgres(Number(recipe.id), true);
+                }}
               >
                 NEXT STEP
               </Button>
@@ -185,7 +271,7 @@ const RecipeView = ({ route }) => {
               <View style={style.header}>
                 <Text style={style.headerTitle}>{recipe.name}</Text>
                 <View style={style.headerRating}>
-                  {[...Array(recipe.rating).keys()].map((id) => (
+                  {[...Array(recipe.rating).keys()]?.map((id) => (
                     <Icon key={id} name="star" size={25} color="gold" />
                   ))}
                   <Text style={style.headerVotes}>({recipe.votes})</Text>
@@ -218,11 +304,27 @@ const RecipeView = ({ route }) => {
               </View>
             </ScrollView>
             <View style={style.options}>
-              <Button style={style.followButton}>{'<3'}</Button>
+              <Button
+                style={style.followButton}
+                onPress={() => uploadReview(Number(recipe.id))}
+              >
+                <Icon name="cards-heart" size={20} />
+              </Button>
               <Button
                 style={style.startButton}
                 labelStyle={style.startButtonText}
-                onPress={() => setInProgress(true)}
+                onPress={() => {
+                  scheduleNotification(
+                    recipe.id,
+                    recipe.steps[0]?.duration || 10,
+                    'Here comes a next step...',
+                    recipe.steps[1]?.name || 'No description provided...',
+                    { ...recipe, started: true }
+                  );
+                  setCurrentStep(0);
+                  setInProgress(true);
+                  postProgress(Number(recipe.id));
+                }}
               >
                 START
               </Button>

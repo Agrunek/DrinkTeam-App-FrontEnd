@@ -1,6 +1,6 @@
 import type { MD3Colors } from 'react-native-paper/lib/typescript/types';
 
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Image,
   View,
@@ -8,9 +8,9 @@ import {
   FlatList,
   TouchableOpacity,
 } from 'react-native';
-import { useTheme, Text, TextInput } from 'react-native-paper';
+import { useTheme, Text } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useSearch } from '../../middleware/queries';
+import { useUserProgress } from '../../middleware/queries';
 import { useNavigation } from '@react-navigation/native';
 import { mapTimeToText } from '../../utils/time';
 
@@ -49,11 +49,13 @@ interface ItemData {
   image: string;
 }
 
-const SearchView = () => {
+const MyRecipiesView = () => {
   const { colors } = useTheme();
-  const [searchTerm, setSearchTerm] = useState('');
-  const { data, isLoading } = useSearch<ItemDataAPI[]>(searchTerm);
+  const { data, isLoading, error } = useUserProgress<ItemDataAPI[]>();
   const navigation = useNavigation();
+
+  console.warn(data);
+  console.warn(error);
 
   const style = styles(colors);
 
@@ -114,20 +116,7 @@ const SearchView = () => {
 
   return (
     <View style={style.container}>
-      <View style={style.header}>
-        <Text style={style.headerText}>Szukaj</Text>
-        <TextInput
-          mode="outlined"
-          left={<TextInput.Icon icon="magnify" color="#FFFFFF" />}
-          outlineStyle={style.headerSearchOutline}
-          style={style.headerSearch}
-          textColor={colors.onBackground}
-          placeholder="Search"
-          placeholderTextColor="#9586A8"
-          value={searchTerm}
-          onChangeText={setSearchTerm}
-        />
-      </View>
+      <Text style={style.headerText}>Twoje przepisy:</Text>
       {isLoading ? (
         <Text style={style.headerText}>LOADING...</Text>
       ) : (
@@ -138,12 +127,6 @@ const SearchView = () => {
           keyExtractor={(item) => item.id.toString()}
         />
       )}
-      <TouchableOpacity
-        style={style.addButton}
-        onPress={() => navigation.navigate('addRecipe')}
-      >
-        <Text style={style.addButtonText}>+</Text>
-      </TouchableOpacity>
     </View>
   );
 };
@@ -154,24 +137,9 @@ const styles = (colors: MD3Colors) => {
       flex: 1,
       backgroundColor: colors.background,
     },
-    header: {
-      marginHorizontal: 20,
-      marginTop: 40,
-      marginBottom: 30,
-      gap: 20,
-    },
     headerText: {
       fontSize: 30,
       color: colors.onBackground,
-    },
-    headerSearch: {
-      backgroundColor: '#23232C',
-      fontSize: 14,
-      height: 50,
-    },
-    headerSearchOutline: {
-      borderRadius: 99999,
-      borderColor: '#9586A8',
     },
     listContainer: {
       padding: 20,
@@ -213,25 +181,7 @@ const styles = (colors: MD3Colors) => {
       color: '#FFFFFF',
       fontSize: 12,
     },
-    addButton: {
-      position: 'absolute',
-      margin: 16,
-      right: 0,
-      bottom: 0,
-      width: 60,
-      height: 60,
-      borderRadius: 30,
-      backgroundColor: colors.primary,
-      justifyContent: 'center',
-      alignItems: 'center',
-      elevation: 5,
-    },
-    addButtonText: {
-      color: '#FFFFFF',
-      fontSize: 24,
-      fontWeight: 'bold',
-    },
   });
 };
 
-export default SearchView;
+export default MyRecipiesView;

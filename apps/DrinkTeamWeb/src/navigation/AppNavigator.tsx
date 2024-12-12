@@ -7,6 +7,7 @@ import SearchView from '../views/Search/SearchView';
 import CustomDrawerContent from './CustomDrawerContent';
 import RecipeView from '../views/Recipe/RecipeView';
 import { NotificationContextProvider } from '../context/NotificationContext';
+import MyRecipiesView from '../views/MyRecipies/MyRecipiesView';
 
 const Drawer = createDrawerNavigator();
 
@@ -50,6 +51,11 @@ const AppNavigator = () => {
             name="Recipe"
             component={RecipeView}
             options={{ title: 'Recipe' }}
+          />
+          <Drawer.Screen
+            name="UserProgress"
+            component={MyRecipiesView}
+            options={{ title: 'My Recipies' }}
           />
         </Drawer.Navigator>
       </NotificationContextProvider>

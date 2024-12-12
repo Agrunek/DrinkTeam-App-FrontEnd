@@ -1,10 +1,16 @@
 import type { MD3Colors } from 'react-native-paper/lib/typescript/types';
 
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Image, StyleSheet, View, ScrollView } from 'react-native';
 import { useTheme, Button, Text } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useExtra } from '../../middleware/queries';
+import {
+  uploadReview,
+  useExtra,
+  useProgress,
+  postProgress,
+  putProgres,
+} from '../../middleware/queries';
 import { mapTimeToText } from '../../utils/time';
 import NotificationContext from '../../context/NotificationContext';
 
@@ -54,6 +60,24 @@ interface ItemExtraAPI {
   }[];
 }
 
+interface UserProgressAPI {
+  user_progress_id: number;
+  started_date: string;
+  finished_date: string;
+  completed: boolean;
+  recipe_id: number;
+  user_id: number;
+  instruction_step: {
+    step: {
+      name: string;
+      description: string;
+      step_number: number;
+      duration: number;
+    };
+  };
+  detail?: string;
+}
+
 interface ItemData {
   id: string;
   name: string;
@@ -87,17 +111,34 @@ const RecipeView = ({ route }) => {
     search?: ItemDataAPI;
   };
   const { data: extra } = useExtra<ItemExtraAPI>(
-    search?.recipe_id || Number(noti?.id) || -1
+    search?.recipe_id || Number(noti?.id) || 0
+  );
+  const { data: userProgress } = useProgress<UserProgressAPI[]>(
+    search?.recipe_id || Number(noti?.id) || 0
   );
 
-  const [currentStep, setCurrentStep] = useState(noti?.currentStep || 0);
   const [inProgress, setInProgress] = useState(noti?.started || false);
+  const [currentStep, setCurrentStep] = useState(noti?.currentStep || 0);
+
+  useEffect(() => {
+    const derivedStarted =
+      userProgress?.findIndex((item) => item.detail) === -1;
+    const derivedUserProgress = userProgress?.filter(
+      (item) => item.completed
+    ).length;
+
+    setInProgress(derivedStarted);
+    setCurrentStep(derivedUserProgress);
+  }, [userProgress]);
+
+  console.log(inProgress);
+  console.log(currentStep);
 
   const recipe: ItemData = {
-    id: (search?.recipe_id || Number(noti?.id) || -1).toString(),
+    id: (search?.recipe_id || Number(noti?.id) || 0).toString(),
     name: search?.name || noti?.name || 'Loading...',
     description: search?.description || noti?.description || 'Loading...',
-    rating: search?.average_rating || noti?.rating || 0,
+    rating: Math.floor(search?.average_rating || noti?.rating || 0),
     votes: search?.number_of_reviews || noti?.votes || 0,
     difficulty:
       {
@@ -199,6 +240,7 @@ const RecipeView = ({ route }) => {
                       { recipe, currentStep: currentStep - 1 }
                     );
                     setCurrentStep((prev) => prev - 1);
+                    putProgres(Number(recipe.id), false);
                   }
                 }}
               >
@@ -216,6 +258,7 @@ const RecipeView = ({ route }) => {
                     { recipe, currentStep: currentStep + 1 }
                   );
                   setCurrentStep((prev) => prev + 1);
+                  putProgres(Number(recipe.id), true);
                 }}
               >
                 NEXT STEP
@@ -261,7 +304,10 @@ const RecipeView = ({ route }) => {
               </View>
             </ScrollView>
             <View style={style.options}>
-              <Button style={style.followButton}>
+              <Button
+                style={style.followButton}
+                onPress={() => uploadReview(Number(recipe.id))}
+              >
                 <Icon name="cards-heart" size={20} />
               </Button>
               <Button
@@ -277,6 +323,7 @@ const RecipeView = ({ route }) => {
                   );
                   setCurrentStep(0);
                   setInProgress(true);
+                  postProgress(Number(recipe.id));
                 }}
               >
                 START

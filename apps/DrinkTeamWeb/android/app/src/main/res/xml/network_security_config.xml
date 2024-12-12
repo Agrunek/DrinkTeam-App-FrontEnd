@@ -3,6 +3,6 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">10.0.2.2</domain>
         <domain includeSubdomains="true">localhost</domain>
-        <domain includeSubdomains="true">drink-team-backend.btdbb2gwh4ggakgx.germanywestcentral.azurecontainer.io</domain>
+        <domain includeSubdomains="true">drinkteambackend.aahch9eccpd3c4g9.germanywestcentral.azurecontainer.io</domain>
     </domain-config>
 </network-security-config>

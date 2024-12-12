@@ -6,6 +6,7 @@ import { useTheme } from 'react-native-paper';
 import SearchView from '../views/Search/SearchView';
 import CustomDrawerContent from './CustomDrawerContent';
 import RecipeView from '../views/Recipe/RecipeView';
+import AddRecipeView from '../views/AddRecipe/AddRecipeView';
 import { NotificationContextProvider } from '../context/NotificationContext';
 import MyRecipiesView from '../views/MyRecipies/MyRecipiesView';
 
@@ -56,6 +57,11 @@ const AppNavigator = () => {
             name="UserProgress"
             component={MyRecipiesView}
             options={{ title: 'My Recipies' }}
+          />
+          <Drawer.Screen 
+            name="addRecipe" 
+            component={AddRecipeView} 
+            options={{ title: 'addRecipe' }} 
           />
         </Drawer.Navigator>
       </NotificationContextProvider>

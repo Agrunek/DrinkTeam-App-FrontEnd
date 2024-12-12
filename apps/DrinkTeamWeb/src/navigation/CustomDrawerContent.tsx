@@ -69,6 +69,14 @@ function CustomDrawerContent(props) {
           }}
         />
       )}
+      {user && (<DrawerItem
+        label="Add Recipe"
+        onPress={() => navigation.navigate('addRecipe')}
+        labelStyle={{
+          color: activeRoute === 'Recipe' ? theme.colors.primary : "white",
+          fontWeight: activeRoute === 'Recipe' ? 'bold' : 'normal',
+        }}
+      />)}
     </DrawerContentScrollView>
   );
 }
